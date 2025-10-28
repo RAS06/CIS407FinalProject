@@ -10,87 +10,234 @@ DB_FILE = "library.db"
 # ==========================================================
 def createTablesIfNotExists(cursor):
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS Author (
-            authorID INTEGER PRIMARY KEY AUTOINCREMENT,
-            authorName TEXT NOT NULL
-        );
-    """)
+                   CREATE TABLE IF NOT EXISTS Author
+                   (
+                       authorID
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       authorName
+                       TEXT
+                       NOT
+                       NULL
+                   );
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS Books (
-            bookID INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            authorID INTEGER NOT NULL,
-            year_published INTEGER,
-            genre TEXT,
-            FOREIGN KEY (authorID) REFERENCES Author(authorID)
-        );
-    """)
+                   CREATE TABLE IF NOT EXISTS Books
+                   (
+                       bookID
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       title
+                       TEXT
+                       NOT
+                       NULL,
+                       authorID
+                       INTEGER
+                       NOT
+                       NULL,
+                       year_published
+                       INTEGER,
+                       genre
+                       TEXT,
+                       FOREIGN
+                       KEY
+                   (
+                       authorID
+                   ) REFERENCES Author
+                   (
+                       authorID
+                   )
+                       );
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS BookCopies (
-            copyID INTEGER PRIMARY KEY AUTOINCREMENT,
-            bookID INTEGER NOT NULL,
-            FOREIGN KEY (bookID) REFERENCES Books(bookID)
-        );
-    """)
+                   CREATE TABLE IF NOT EXISTS BookCopies
+                   (
+                       copyID
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       bookID
+                       INTEGER
+                       NOT
+                       NULL,
+                       FOREIGN
+                       KEY
+                   (
+                       bookID
+                   ) REFERENCES Books
+                   (
+                       bookID
+                   )
+                       );
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS LibraryMember (
-            memberID INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            address TEXT,
-            phone TEXT,
-            email TEXT,
-            DateOfMembership DATE
-        );
-    """)
+                   CREATE TABLE IF NOT EXISTS LibraryMember
+                   (
+                       memberID
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       name
+                       TEXT
+                       NOT
+                       NULL,
+                       address
+                       TEXT,
+                       phone
+                       TEXT,
+                       email
+                       TEXT,
+                       DateOfMembership
+                       DATE
+                   );
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS Librarian (
-            librarianID INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT,
-            phone TEXT
-        );
-    """)
+                   CREATE TABLE IF NOT EXISTS Librarian
+                   (
+                       librarianID
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       name
+                       TEXT
+                       NOT
+                       NULL,
+                       email
+                       TEXT,
+                       phone
+                       TEXT
+                   );
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS BookLoans (
-            loanID INTEGER PRIMARY KEY AUTOINCREMENT,
-            copyID INTEGER NOT NULL,
-            memberID INTEGER NOT NULL,
-            librarianID INTEGER NOT NULL,
-            dateIssued DATE,
-            dateDue DATE,
-            dateReturned DATE,
-            FOREIGN KEY (copyID) REFERENCES BookCopies(copyID),
-            FOREIGN KEY (memberID) REFERENCES LibraryMember(memberID),
-            FOREIGN KEY (librarianID) REFERENCES Librarian(librarianID)
-        );
-    """)
+                   CREATE TABLE IF NOT EXISTS BookLoans
+                   (
+                       loanID
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       copyID
+                       INTEGER
+                       NOT
+                       NULL,
+                       memberID
+                       INTEGER
+                       NOT
+                       NULL,
+                       librarianID
+                       INTEGER
+                       NOT
+                       NULL,
+                       dateIssued
+                       DATE,
+                       dateDue
+                       DATE,
+                       dateReturned
+                       DATE,
+                       FOREIGN
+                       KEY
+                   (
+                       copyID
+                   ) REFERENCES BookCopies
+                   (
+                       copyID
+                   ),
+                       FOREIGN KEY
+                   (
+                       memberID
+                   ) REFERENCES LibraryMember
+                   (
+                       memberID
+                   ),
+                       FOREIGN KEY
+                   (
+                       librarianID
+                   ) REFERENCES Librarian
+                   (
+                       librarianID
+                   )
+                       );
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS Holds (
-            holdID INTEGER PRIMARY KEY AUTOINCREMENT,
-            memberID INTEGER NOT NULL,
-            bookID INTEGER NOT NULL,
-            holdDate DATE,
-            FOREIGN KEY (memberID) REFERENCES LibraryMember(memberID),
-            FOREIGN KEY (bookID) REFERENCES Books(bookID)
-        );
-    """)
+                   CREATE TABLE IF NOT EXISTS Holds
+                   (
+                       holdID
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       memberID
+                       INTEGER
+                       NOT
+                       NULL,
+                       bookID
+                       INTEGER
+                       NOT
+                       NULL,
+                       holdDate
+                       DATE,
+                       FOREIGN
+                       KEY
+                   (
+                       memberID
+                   ) REFERENCES LibraryMember
+                   (
+                       memberID
+                   ),
+                       FOREIGN KEY
+                   (
+                       bookID
+                   ) REFERENCES Books
+                   (
+                       bookID
+                   )
+                       );
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS Fines (
-            fineID INTEGER PRIMARY KEY AUTOINCREMENT,
-            loanID INTEGER UNIQUE NOT NULL,
-            fineAmount REAL NOT NULL,
-            fineDate DATE,
-            datePaid DATE,
-            FOREIGN KEY (loanID) REFERENCES BookLoans(loanID)
-        );
-    """)
+                   CREATE TABLE IF NOT EXISTS Fines
+                   (
+                       fineID
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       loanID
+                       INTEGER
+                       UNIQUE
+                       NOT
+                       NULL,
+                       fineAmount
+                       REAL
+                       NOT
+                       NULL,
+                       fineDate
+                       DATE,
+                       datePaid
+                       DATE,
+                       FOREIGN
+                       KEY
+                   (
+                       loanID
+                   ) REFERENCES BookLoans
+                   (
+                       loanID
+                   )
+                       );
+                   """)
 
 
 def get_connection():
@@ -107,7 +254,7 @@ def init_db():
     conn.close()
 
 
-#HELPER CLASS
+# HELPER CLASSES
 class AddRecordWindow(tk.Toplevel):
     def __init__(self, parent, table_name, columns):
         super().__init__(parent.root)
@@ -156,6 +303,72 @@ class AddRecordWindow(tk.Toplevel):
             self.destroy()
         except Exception as e:
             messagebox.showerror("Error", f"Failed to add record: {e}")
+
+
+class EditRecordWindow(tk.Toplevel):
+    def __init__(self, parent, table_name, record_data, columns, pk_column):
+        super().__init__(parent.root)
+        self.parent = parent
+        self.table_name = table_name
+        self.record_data = record_data
+        self.columns = columns
+        self.pk_column = pk_column
+        self.pk_value = record_data[0]  # First value is the primary key
+        self.entries = {}
+
+        self.title(f"Edit Record — {table_name}")
+        self.geometry("400x400")
+        self.resizable(False, False)
+
+        tk.Label(self, text=f"Edit record in {table_name}", font=("Arial", 14, "bold")).pack(pady=10)
+
+        form_frame = tk.Frame(self)
+        form_frame.pack(fill="both", expand=True, padx=20, pady=10)
+
+        # Create form fields with current values as placeholders
+        for i, col in enumerate(columns):
+            tk.Label(form_frame, text=col + ":", anchor="w").grid(row=i, column=0, sticky="w", pady=5)
+
+            # Skip the primary key column (it's read-only)
+            if col == pk_column:
+                value_label = tk.Label(form_frame, text=str(record_data[i]), bg="#f0f0f0", relief="sunken")
+                value_label.grid(row=i, column=1, pady=5, sticky="ew")
+                tk.Label(form_frame, text="(Primary Key - Cannot Edit)", font=("Arial", 8), fg="gray").grid(row=i,
+                                                                                                            column=2,
+                                                                                                            sticky="w")
+            else:
+                entry = tk.Entry(form_frame, width=30)
+                entry.insert(0, str(record_data[i]))
+                entry.grid(row=i, column=1, pady=5)
+                self.entries[col] = entry
+
+        button_frame = tk.Frame(self)
+        button_frame.pack(pady=10)
+
+        tk.Button(button_frame, text="Save", command=self.save_record, width=10).pack(side="left", padx=5)
+        tk.Button(button_frame, text="Cancel", command=self.destroy, width=10).pack(side="left", padx=5)
+
+    def save_record(self):
+        data = {col: entry.get() for col, entry in self.entries.items()}
+        if not all(v.strip() for v in data.values()):
+            messagebox.showwarning("Missing Data", "All fields are required.")
+            return
+
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+            set_clause = ", ".join([f"{col}=?" for col in data.keys()])
+            cursor.execute(
+                f"UPDATE {self.table_name} SET {set_clause} WHERE {self.pk_column}=?",
+                (*data.values(), self.pk_value)
+            )
+            conn.commit()
+            conn.close()
+            messagebox.showinfo("Success", "Record updated.")
+            self.parent.display_table()
+            self.destroy()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to update record: {e}")
 
 
 # ==========================================================
@@ -278,40 +491,21 @@ class LibraryApp:
             return
 
         record = self.tree.item(selected, "values")
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute(f"PRAGMA table_info({table_name})")
-        columns = [info[1] for info in cursor.fetchall()]
-        conn.close()
-
-        pk_column = columns[0]
-        pk_value = record[0]
-        editable_columns = columns[1:]  # skip PK
-
-        new_values = {}
-        for i, col in enumerate(editable_columns, start=1):
-            value = simpledialog.askstring("Edit", f"{col} (current: {record[i]}):")
-            if value is not None:
-                new_values[col] = value
-
-        if not new_values:
-            return
 
         try:
             conn = get_connection()
             cursor = conn.cursor()
-            set_clause = ", ".join([f"{col}=?" for col in new_values])
-            cursor.execute(
-                f"UPDATE {table_name} SET {set_clause} WHERE {pk_column}=?",
-                (*new_values.values(), pk_value)
-            )
-            conn.commit()
-            messagebox.showinfo("Success", "Record updated.")
-            self.display_table()
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to update record: {e}")
-        finally:
+            cursor.execute(f"PRAGMA table_info({table_name})")
+            columns_info = cursor.fetchall()
             conn.close()
+
+            columns = [info[1] for info in columns_info]
+            pk_column = columns_info[0][1]  # First column is primary key
+
+            EditRecordWindow(self, table_name, record, columns, pk_column)
+
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not open edit record window: {e}")
 
     def delete_record(self):
         table_name = self.active_table.get()
@@ -339,7 +533,6 @@ class LibraryApp:
             messagebox.showerror("Error", f"Failed to delete record: {e}")
         finally:
             conn.close()
-
 
 
 # ==========================================================
