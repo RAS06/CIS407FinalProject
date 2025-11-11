@@ -109,17 +109,14 @@ def init_db():
         conn.commit()
 
 # ---------------------------------------------------------
-#  NEW: fine synchroniser
+#  NEW: fine synchroniser  (fineDate = today)
 # ---------------------------------------------------------
 def sync_fines():
-    """
-    Ensure every *unreturned* overdue loan has an up-to-date fine row.
-    Fine date = loan.dateDue, amount = days-overdue × 0.10
-    """
     today = datetime.today().date()
+    today_str = today.strftime("%Y-%m-%d")
+
     with get_connection() as conn:
         cursor = conn.cursor()
-        # find all unreturned loans that are past due
         cursor.execute("""
             SELECT loanID, dateDue
             FROM BookLoans
@@ -133,7 +130,6 @@ def sync_fines():
             days_over = (today - due_date).days
             amount = round(days_over * 0.10, 2)
 
-            # insert or replace fine row
             cursor.execute("""
                 INSERT INTO Fines (loanID, fineAmount, fineDate, datePaid)
                 VALUES (?, ?, ?, NULL)
@@ -142,7 +138,7 @@ def sync_fines():
                     fineDate=excluded.fineDate,
                     datePaid=NULL
                 WHERE datePaid IS NULL
-            """, (loan_id, amount, due_str))
+            """, (loan_id, amount, today_str))
         conn.commit()
 
 # ==========================================================
@@ -167,7 +163,8 @@ class AddRecordWindow(tk.Toplevel):
         for i, col in enumerate(columns):
             tk.Label(form_frame, text=col + ":", anchor="w").grid(row=i, column=0, sticky="w", pady=5)
             entry = tk.Entry(form_frame, width=30)
-            # pre-fill dates for BookLoans and Holds and LibraryMember
+
+            # pre-fill dates
             if self.table_name == "BookLoans":
                 if col == "dateIssued":
                     entry.insert(0, datetime.today().strftime("%Y-%m-%d"))
@@ -179,6 +176,9 @@ class AddRecordWindow(tk.Toplevel):
                 entry.insert(0, datetime.today().strftime("%Y-%m-%d"))
             elif self.table_name == "LibraryMember" and col == "DateOfMembership":
                 entry.insert(0, datetime.today().strftime("%Y-%m-%d"))
+            elif self.table_name == "Fines" and col == "fineDate":
+                entry.insert(0, datetime.today().strftime("%Y-%m-%d"))
+
             entry.grid(row=i, column=1, pady=5)
             self.entries[col] = entry
 
@@ -189,13 +189,15 @@ class AddRecordWindow(tk.Toplevel):
 
     def save_record(self):
         data = {col: entry.get() for col, entry in self.entries.items()}
-        if not all(v.strip() for v in data.values()):
-            messagebox.showwarning("Missing Data", "All fields are required.")
-            return
 
-        if self.table_name == "BookLoans":
-            if not data.get("dateReturned", "").strip():
-                data.pop("dateReturned", None)
+        # Allow NULL datePaid for Fines only
+        if self.table_name == "Fines":
+            # datePaid was removed from the dialog → skip it
+            data.pop("datePaid", None)
+        else:
+            if not all(v.strip() for v in data.values()):
+                messagebox.showwarning("Missing Data", "All fields are required.")
+                return
 
         try:
             with get_connection() as conn:
@@ -461,6 +463,9 @@ class LibraryApp:
                 all_cols = cursor.fetchall()
                 editable = [col[1] for col in all_cols
                             if col[5] == 0 and col[1] != "dateReturned"]
+                # drop datePaid for Fines
+                if table_name == "Fines":
+                    editable = [c for c in editable if c != "datePaid"]
             if not editable:
                 messagebox.showinfo("No editable fields", f"{table_name} has no user-editable fields.")
                 return
